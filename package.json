@@ -1,0 +1,17 @@
+{
+  "name": "scorpio",
+  "version": "1.0.0",
+  "description": "Discord nodejs bot for Star Wars Galaxy of Heroes. Integrated swgoh.help api with mongodb caching.",
+  "main": "bot.js",
+  "dependencies": {
+    "api-swgoh-help": "^2.0.0",
+    "discord.js": "^11.3.2",
+    "mongodb": "^3.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/r3volved/scorpio.git"
+  },
+  "author": "shittybill",
+  "license": "MIT"
+}
