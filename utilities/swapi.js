@@ -4,7 +4,7 @@ module.exports = (clientSwgoh, clientCache, clientHelpers) => {
 	cache = clientCache;
 	helpers = clientHelpers;
 	
-	playerCooldown = -10;
+	playerCooldown = 2;
 	guildCooldown = 6;
 	
 	return {
@@ -20,20 +20,21 @@ async function player( allycode, language ) {
     	
 		if( !allycode || isNaN(allycode) ) { throw new Error('Please provide a valid allycode'); }
 		allycode = parseInt(allycode);
-				
+		
+        let expiredDate = new Date();
+	        expiredDate.setHours(expiredDate.getHours() - playerCooldown);
+		
 		/** Get player from cache */
-		let player = await cache.get('swapi', 'players', {allyCode:allycode});
+		let player = await cache.get('swapi', 'players', {allyCode:allycode, updated:{ $gte:expiredDate.getTime() }});
 
 		/** Check if existance and expiration */
-		if( !player || !player[0] || isExpired(player[0].updated, playerCooldown) ) { 
+		if( !player || !player[0] ) { 
 			/** If not found or expired, fetch new from API and save to cache */
-			player = await swgoh.fetchPlayer({ allycode:allycode, language:(language || "eng_us") });
-			player = await cache.put('swapi', 'players', {allyCode:allycode}, player);
-		} else {
-			/** If found and valid, serve from cache */
-			player = player[0];
-		}
+			player = await swgoh.fetchPlayer({ allycodes:allycode, language:(language || "eng_us") });
+			player = await cache.put('swapi', 'players', {allyCode:player[0].allyCode}, player[0]);
+		} 
 
+        player = Array.isArray(player) ? player[0] : player;
 		return player;
 		
 	} catch(e) { 
@@ -53,10 +54,13 @@ async function guild( allycode, language ) {
 		let player = await cache.get('swapi', 'players', {allyCode:allycode});
 		if( !player || !player[0] ) { throw new Error('I don\'t know this player, try syncing them first'); }
 		
-		let guild  = await cache.get('swapi', 'guilds', {name:player[0].guildName});
+        let expiredDate = new Date();
+	        expiredDate.setHours(expiredDate.getHours() - guildCooldown);
+
+		let guild  = await cache.get('swapi', 'guilds', {name:player[0].guildName, updated:{ $gte:expiredDate.getTime() }});
 
 		/** Check if existance and expiration */
-		if( !guild || !guild[0] || isExpired(guild[0].updated, guildCooldown) ) { 
+		if( !guild || !guild[0] ) { 
 			/** If not found or expired, fetch new from API and save to cache */
 			guild = await swgoh.fetchGuild({ allycode:allycode, language:(language || "eng_us") });
 			guild = await cache.put('swapi', 'guilds', {name:guild.name}, guild);
@@ -81,9 +85,4 @@ async function guild( allycode, language ) {
 		throw e; 
 	}    		
 
-}
-
-function isExpired( updated, cooldown ) {
-	let diff = helpers.convertMS( new Date() - new Date(updated) );
-	return diff.day >= 0 && diff.hour >= cooldown;	
 }

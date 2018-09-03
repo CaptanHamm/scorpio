@@ -1,10 +1,10 @@
 {
   "name": "scorpio",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Discord nodejs bot for Star Wars Galaxy of Heroes. Integrated swgoh.help api with mongodb caching.",
   "main": "bot.js",
   "dependencies": {
-    "api-swgoh-help": "^2.0.0",
+    "api-swgoh-help": "^3.0.3",
     "discord.js": "^11.3.2",
     "mongodb": "^3.1.1"
   },

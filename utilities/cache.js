@@ -21,12 +21,12 @@ async function put( database, collection, matchCondition, saveObject ) {
 		const dbo = await mongo.db( database );
 	    
     	//set updated time to now
-		saveObject.updated = new Date();
-		saveObject.updated = saveObject.updated.getTime();
+		saveObject.updated = (new Date()).getTime();
     	
         //Try update or insert
 		matchCondition = matchCondition || {};
-    	let result = await dbo.collection(collection).updateOne(matchCondition, 
+    	let result = await dbo.collection(collection).updateOne(
+    	    matchCondition, 
 			{ $set: saveObject }, 
 			{ upsert:true }
     	);

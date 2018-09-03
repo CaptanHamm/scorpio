@@ -12,11 +12,11 @@ module.exports = async ( client, message ) => {
 
 		/** Get player from swapi cacher */
 		let player = await client.swapi.player(allycode, 'eng_us');
-
+		
 		/** 
 		 * REPORT OR PROCEED TO DO STUFF WITH PLAYER OBJECT 
 		 * */
-		
+
 		let today = new Date();
 		let age = client.helpers.convertMS(today - new Date(player.updated));
 		
